@@ -59,6 +59,11 @@ const RequestPasswordResetSchema = Joi.object({
   email: email,
 });
 
+const SearchUserSchema = Joi.object({
+  userId: name,
+  searchKey: name,
+});
+
 async function RegisterUserValidationMW(req, res, next) {
   const userPayLoad = req.body;
 
@@ -169,6 +174,20 @@ async function ContactOurSupportMW(req, res, next) {
   }
 }
 
+async function SearchUserValidationMW(req, res, next) {
+  const searchPayload = { searchKey: req.query.query };
+
+  try {
+    await SearchUserSchema.validateAsync(searchPayload);
+    next();
+  } catch (error) {
+    next({
+      message: error.details[0].message,
+      status: 400,
+    });
+  }
+}
+
 export {
   RegisterUserValidationMW,
   OtpValidationMW,
@@ -178,4 +197,5 @@ export {
   AuthenticateUserValidationMW,
   MailingListValidationMW,
   ContactOurSupportMW,
+  SearchUserValidationMW,
 };

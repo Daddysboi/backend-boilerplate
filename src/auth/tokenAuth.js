@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken";
 
-import { config } from "./auth0.js";
-
 const VerifyTokenMW = async (req, res, next) => {
   const token = req.header("Authorization");
   if (!token) {
@@ -12,7 +10,7 @@ const VerifyTokenMW = async (req, res, next) => {
       .redirect("/login");
   }
   try {
-    const decoded = jwt.verify(token, config.secretKey);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (decoded && decoded.user !== null && decoded.user !== undefined) {
       const { id, username } = decoded.user;
       req.user = {

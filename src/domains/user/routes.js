@@ -1,6 +1,5 @@
 import express from "express";
 
-import { VerifyTokenMW } from "../../auth/tokenAuth.js";
 import {
   getAllUsers,
   registerUser,
@@ -14,6 +13,7 @@ import {
   AuthenticateUserValidationMW,
   ChangePasswordValidationMW,
 } from "../../validators/validators.js";
+import { VerifyTokenMW } from "../../auth/tokenAuth.js";
 
 const userRouter = express.Router();
 
@@ -26,6 +26,6 @@ userRouter.patch(
   ChangePasswordValidationMW,
   changePassword
 );
-userRouter.patch("/search-user", ChangePasswordValidationMW, searchUser);
+userRouter.patch("/search-user", searchUser);
 
 export { userRouter };

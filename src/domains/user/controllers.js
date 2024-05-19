@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { hashedData, verifyHashedData } from "../../utils/utils.js";
+import { sendWelcomeEmail } from "./mailer.js";
 
 // Models
 import { UserModel } from "./model.js";
@@ -42,7 +43,8 @@ async function registerUser(req, res) {
 
     const createdUser = await newUser.save();
 
-    // TO DO: send a welcome mail notification to the user
+    // Send a welcome mail notification to the user
+    await sendWelcomeEmail(email, firstName);
 
     res.json({
       data: createdUser,
@@ -96,7 +98,7 @@ async function authenticateUser(req, res) {
       });
     }
 
-    const token = jwt.sign({ userId: fetchedUserId }, "your-secret-key", {
+    const token = jwt.sign({ userId: fetchedUserId }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -188,20 +190,31 @@ async function changePassword(req, res) {
 
 const searchUser = asyncHandler(async (req, res) => {
   try {
-    const keyword = req.query.query
+    const keyword = req.query.query //http://example.com/search?query=john from query parameter
       ? {
           $or: [
-            { name: { $regex: req.query.query, $options: "i" } },
-            { email: { $regex: req.query.query, $options: "i" } },
+            { name: { $regex: keyword, $options: "i" } },
+            { email: { $regex: keyword, $options: "i" } },
           ],
         }
       : {};
     const users = await UserModel.find(keyword);
 
-    res.send(users);
+    if (!users.length) {
+      return res.status(404).json({
+        message: "No user found!",
+      });
+    }
+
+    res.json({
+      data: users,
+      status: 200,
+      message: "Users fetched successfully",
+    });
   } catch (error) {
-    res.status(400).json({
-      message: "No user Found!",
+    res.status(500).json({
+      message: error.message,
+      status: 500,
     });
   }
 });
