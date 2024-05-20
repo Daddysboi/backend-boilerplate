@@ -34,9 +34,9 @@ const AuthenticateUserSchema = Joi.object({
 });
 
 const ContactOurSupportSchema = Joi.object({
-  fullName: Joi.string().email().trim().required(),
+  fullName: Joi.string().trim().required(),
   email: Joi.string().email().trim().required(),
-  message: Joi.string().email().trim().required(),
+  message: Joi.string().trim().required(),
   createAt: Joi.date().default(Date.now),
 });
 
@@ -62,8 +62,8 @@ const ChangePasswordSchema = Joi.object({
 });
 
 const PasswordResetSchema = Joi.object({
-  userId: Joi.string().email().trim().required(),
-  resetString: Joi.string().email().trim().required(),
+  userId: Joi.string().trim().required(),
+  resetString: Joi.string().trim().required(),
   newPassword: Joi.string()
     .min(8)
     .regex(
@@ -73,7 +73,7 @@ const PasswordResetSchema = Joi.object({
 });
 
 const RequestPasswordResetSchema = Joi.object({
-  redirectUrl: Joi.string().email().trim().required(),
+  redirectUrl: Joi.string().max(255).trim().required(),
   email: Joi.string().email().trim().required(),
 });
 

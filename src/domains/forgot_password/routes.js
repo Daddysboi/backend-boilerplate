@@ -10,7 +10,7 @@ const forgotPasswordRouter = express.Router();
 
 forgotPasswordRouter.post(
   "/request-password-reset",
-  RequestPasswordResetMW,
+  // RequestPasswordResetMW,
   requestPasswordReset
 );
 forgotPasswordRouter.post("/password-reset", PasswordResetMW, passwordReset);
