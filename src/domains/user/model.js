@@ -5,12 +5,12 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   firstName: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   lastName: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
   },
   email: {
@@ -20,8 +20,13 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    required: true,
-    enum: ["client", ""],
+    enum: ["client", "admin"],
+    default: "client",
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // allows for this field to be unique but also nullable
   },
   walletDetails: {
     type: Number,
@@ -29,7 +34,7 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    default: null,
   },
   otp: {
     type: String,

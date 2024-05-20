@@ -17,7 +17,9 @@ googleAuthRouter.get(
 
 googleAuthRouter.get(
   "/auth/google/redirect",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", {
+    failureRedirect: "/",
+  }),
   redirect
 );
 

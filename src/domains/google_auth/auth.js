@@ -6,18 +6,6 @@ import { UserModel } from "../user/model.js";
 
 dotenv.config();
 
-// stores user into a cookie when sending to the client
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// coverts cookie into a user when coming back to our server
-passport.deserializeUser((id, done) => {
-  UserModel.findById(id).then((user) => {
-    done(null, user);
-  });
-});
-
 passport.use(
   new GoogleStrategy(
     {
@@ -25,29 +13,56 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
-    (profile, done) => {
-      // check if user already exist in db
-      UserModel.findOne({ googleId: profile.id }).then((currentUser) => {
-        if (currentUser) {
-          //user already exists
-          console.log("user is", currentUser);
-
-          done(null, currentUser);
-          console.log("here");
-        } else {
-          //create new use in db
-          new UserModel({
-            name: profile.displayName,
-            googleId: profile.id,
-            profilePicture: profile._json.picture,
-          })
-            .save()
-            .then((newUser) => {
-              console.loog("new user created:", newUser);
-              done(null, newUser);
-            });
+    async (accessToken, refreshToken, profile, done) => {
+      console.log("profile", profile);
+      try {
+        // Find user by Google ID first
+        let existingUser = await UserModel.findOne({ googleId: profile.id });
+        if (existingUser) {
+          return done(null, existingUser);
         }
-      });
+
+        // If no user found by Google ID, attempt to find by email
+        existingUser = await UserModel.findOne({
+          email: profile.emails[0].value,
+        });
+        console.log("here");
+
+        if (existingUser) {
+          // If user found by email, update their Google ID
+          existingUser.googleId = profile.id;
+          await existingUser.save();
+          return done(null, existingUser);
+        }
+        console.log("here oooo");
+
+        // If no user found, create a new user
+        const newUser = new UserModel({
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+          email: profile.emails[0].value,
+          googleId: profile.id,
+          profilePicture: profile.photos[0].value,
+          role: "client", // Default role
+        });
+        await newUser.save();
+        done(null, newUser);
+      } catch (error) {
+        done(error, null);
+      }
     }
   )
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await UserModel.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});

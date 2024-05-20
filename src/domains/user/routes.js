@@ -19,7 +19,12 @@ import { VerifyTokenMW } from "../../auth/tokenAuth.js";
 const userRouter = express.Router();
 
 userRouter.get("/users", VerifyTokenMW, getAllUsers);
-userRouter.get("/getUserById/:userId", VerifyTokenMW, getUserById);
+userRouter.get(
+  "/getUserById/:userId",
+
+  // VerifyTokenMW,
+  getUserById
+);
 userRouter.post("/register", RegisterUserValidationMW, registerUser);
 userRouter.post("/signin", AuthenticateUserValidationMW, authenticateUser);
 userRouter.patch(
