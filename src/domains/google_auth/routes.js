@@ -6,9 +6,10 @@ import { redirect } from "./controller.js";
 
 const googleAuthRouter = Router();
 
-googleAuthRouter.get("/", (req, res) => {
-  res.send('<a href="/auth/google">Authenticate with google</a>');
-});
+//For testing purpose only
+// googleAuthRouter.get("/", (req, res) => {
+//   res.send('<a href="/auth/google">Authenticate with google</a>');
+// });
 
 googleAuthRouter.get(
   "/auth/google",
@@ -22,10 +23,5 @@ googleAuthRouter.get(
   }),
   redirect
 );
-
-// googleAuthRouter.get('/logout', (req, res) => {
-//   req.logout()
-//   res.redirect('/')
-// })
 
 export { googleAuthRouter };

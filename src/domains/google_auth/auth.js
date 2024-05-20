@@ -11,9 +11,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      callbackURL: `${process.env.CLIENT_URL}/redirect`,
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (profile, done) => {
       console.log("profile", profile);
       try {
         // Find user by Google ID first
