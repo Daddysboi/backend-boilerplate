@@ -1,17 +1,18 @@
 import express from "express";
-import { requestPasswordReset, passwordReset } from "./controllers";
+
 import {
   RequestPasswordResetMW,
   PasswordResetMW,
-} from "../../validators/validators";
+} from "../../validators/validators.js";
+import { requestPasswordReset, passwordReset } from "./controllers.js";
 
-const router = express.Router();  
+const forgotPasswordRouter = express.Router();
 
-router.post(
+forgotPasswordRouter.post(
   "/request-password-reset",
   RequestPasswordResetMW,
   requestPasswordReset
 );
-router.post("/password-reset", PasswordResetMW, passwordReset);
+forgotPasswordRouter.post("/password-reset", PasswordResetMW, passwordReset);
 
-export { router };
+export { forgotPasswordRouter };

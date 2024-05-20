@@ -1,5 +1,6 @@
-import {ContactOurSupportModel }from "./model";
 import dotenv from "dotenv";
+
+import { ContactOurSupportModel } from "./model.js";
 
 dotenv.config();
 

@@ -1,3 +1,3 @@
-import { router } from "./routes";
+import { forgotPasswordRouter } from "./routes";
 
-export default router;
+export default forgotPasswordRouter;

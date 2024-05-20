@@ -1,14 +1,20 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
+
 import { hashedData, verifyHashedData } from "../../utils/utils.js";
-import { sendWelcomeEmail } from "./mailer.js";
+import {
+  sendWelcomeEmail,
+  sendSignInEmail,
+  sendPasswordUpdateEmail,
+} from "./mailer.js";
 
 // Models
 import { UserModel } from "./model.js";
 import { OtpModel } from "../otp-verification/model.js";
 
 async function registerUser(req, res) {
-  const { firstName, lastName, email, password, role, otp } = req.body;
+  const user = req.body;
+  const { firstName, lastName, email, password, role, otp } = user;
 
   try {
     const existingUser = await UserModel.findOne({ email });
@@ -20,10 +26,10 @@ async function registerUser(req, res) {
       });
     }
 
-    const otpResponse = await OtpModel.findOne({ email })
+    const otpResponse = await OtpModel.find({ email })
       .sort({ createdAt: -1 })
       .limit(1);
-    if (otpResponse === 0 || otp !== otpResponse[0].otp) {
+    if (otpResponse.length === 0 || otp !== otpResponse[0].otp) {
       return res.json({
         status: 400,
         message: "The OTP is not valid",
@@ -33,24 +39,28 @@ async function registerUser(req, res) {
     const hashedPassword = await hashedData(password);
     user.lastUpdateAt = new Date();
 
-    const newUser = new UserModel({
-      firstName,
-      lastName,
-      email,
-      role,
-      password: hashedPassword,
-    });
+    if (!UserModel.schema.path("role").enumValues.includes(role)) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid role value",
+      });
+    } else {
+      const newUser = new UserModel({
+        firstName,
+        lastName,
+        email,
+        role,
+        password: hashedPassword,
+      });
+      const createdUser = await newUser.save();
 
-    const createdUser = await newUser.save();
-
-    // Send a welcome mail notification to the user
-    await sendWelcomeEmail(email, firstName);
-
-    res.json({
-      data: createdUser,
-      status: 201,
-      message: "User created successfully",
-    });
+      await sendWelcomeEmail(email, firstName); // Send a welcome mail notification to the user
+      res.json({
+        data: createdUser,
+        status: 201,
+        message: "User created successfully",
+      });
+    }
   } catch (err) {
     console.log(err, err.message);
     res.status(500).json({
@@ -102,7 +112,7 @@ async function authenticateUser(req, res) {
       expiresIn: "1h",
     });
 
-    // TO DO: send a sign in alert mail notification to the user
+    await sendSignInEmail(email); // TO DO: send a sign in alert mail notification to the user
 
     res.json({
       data: {
@@ -176,6 +186,8 @@ async function changePassword(req, res) {
     const hashedNewPassword = await hashedData(newPassword);
     await UserModel.updateOne({ _id: userId }, { password: hashedNewPassword });
 
+    await sendPasswordUpdateEmail(email); // TO DO: send a sign in alert mail notification to the user
+
     res.json({
       message: "Password updated successfully",
       status: 200,
@@ -190,11 +202,12 @@ async function changePassword(req, res) {
 
 const searchUser = asyncHandler(async (req, res) => {
   try {
-    const keyword = req.query.query //http://example.com/search?query=john from query parameter
+    const keyword = req.query.query
       ? {
           $or: [
-            { name: { $regex: keyword, $options: "i" } },
-            { email: { $regex: keyword, $options: "i" } },
+            { firstName: { $regex: query, $options: "i" } },
+            { lastName: { $regex: query, $options: "i" } },
+            { email: { $regex: query, $options: "i" } },
           ],
         }
       : {};

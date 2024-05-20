@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
-import "../../auth/auth.js";
+
+import "./auth.js";
 import { redirect } from "./controller.js";
 
 const googleAuthRouter = Router();

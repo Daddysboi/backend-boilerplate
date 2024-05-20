@@ -1,74 +1,21 @@
-import Joi from "joi";
-
-const name = Joi.string().max(255).trim().required();
-const email = Joi.string().email().trim().required();
-const password = Joi.string()
-  .min(8)
-  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-  .required();
-
-const RegisterUserSchema = Joi.object({
-  firstName: name,
-  lastName: name,
-  password: password,
-  otp: name,
-  email: email,
-  role: name,
-  createAt: Joi.date().default(Date.now),
-  lastUpdateAt: Joi.date().default(Date.now),
-});
-
-const OtpSchema = Joi.object({
-  email: name,
-  otp: Joi.string().optional(),
-  createAt: Joi.date().default(Date.now),
-  lastUpdateAt: Joi.date().default(Date.now),
-});
-
-const AuthenticateUserSchema = Joi.object({
-  email: email,
-  password: password,
-});
-
-const ContactOurSupportSchema = Joi.object({
-  fullName: name,
-  email: email,
-  message: name,
-  createAt: Joi.date().default(Date.now),
-});
-
-const MailingListSchema = Joi.object({
-  email: email,
-  createAt: Joi.date().default(Date.now),
-});
-
-const ChangePasswordSchema = Joi.object({
-  userId: name,
-  oldPassword: password,
-  newPassword: password,
-});
-
-const PasswordResetSchema = Joi.object({
-  userId: name,
-  resetString: name,
-  newPassword: password,
-});
-
-const RequestPasswordResetSchema = Joi.object({
-  redirectUrl: name,
-  email: email,
-});
-
-const SearchUserSchema = Joi.object({
-  userId: name,
-  searchKey: name,
-});
+import {
+  RegisterUserSchema,
+  OtpSchema,
+  AuthenticateUserSchema,
+  ContactOurSupportSchema,
+  MailingListSchema,
+  ChangePasswordSchema,
+  PasswordResetSchema,
+  RequestPasswordResetSchema,
+  SearchUserSchema,
+} from "./validationSchemas.js";
 
 async function RegisterUserValidationMW(req, res, next) {
   const userPayLoad = req.body;
 
   try {
-    await RegisterUserSchema.validateAsync(userPayLoad);
+    await RegisterUserSchema.validateAsync(userPayLoad, { abortEarly: false });
+
     next();
   } catch (error) {
     next({

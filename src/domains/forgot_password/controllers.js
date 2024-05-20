@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
-import userModel from "../user/model";
-import {ForgotPasswordModel} from "./model";
-import hashedData from "../../utils/hashedData";
-import verifyHashedData from "../../utils/verifyHashedData";
 import dotenv from "dotenv";
+
+import { UserModel } from "../user/model.js";
+import { ForgotPasswordModel } from "./model.js";
+import { hashedData, verifyHashedData } from "../../utils/utils.js";
 
 dotenv.config();
 
 async function requestPasswordReset(req, res) {
   let { email, redirectUrl } = req.body;
   try {
-    const fetchedUser = await userModel.find({ email });
+    const fetchedUser = await UserModel.find({ email });
     if (!fetchedUser?.length) {
       return res.json({
         message: "No account with the supplied email exist",
@@ -75,11 +75,14 @@ async function passwordReset(req, res) {
         });
       }
       const hashedNewPassword = await hashedData(newPassword);
-      await userModel.updateOne(
+      await UserModel.updateOne(
         { _id: userId },
         { password: hashedNewPassword }
       );
       await ForgotPasswordModel.deleteOne({ userId });
+
+      // send  password Reset Mail
+
       res.json({
         message: "Password updated successfully",
         status: 200,

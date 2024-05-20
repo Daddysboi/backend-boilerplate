@@ -1,9 +1,13 @@
 import express from "express";
-import { ContactOurSupportMW } from "../../validators/validators";
-import { contactOurSupport } from "./controllers";
+import { ContactOurSupportMW } from "../../validators/validators.js";
+import { contactOurSupport } from "./controllers.js";
 
-const router = express.Router();
+const contactRouter = express.Router();
 
-router.post("/contact-our-support", ContactOurSupportMW, contactOurSupport);
+contactRouter.post(
+  "/contact-our-support",
+  ContactOurSupportMW,
+  contactOurSupport
+);
 
-export { router };
+export { contactRouter };

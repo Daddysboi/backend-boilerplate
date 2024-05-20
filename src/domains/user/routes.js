@@ -12,6 +12,7 @@ import {
   RegisterUserValidationMW,
   AuthenticateUserValidationMW,
   ChangePasswordValidationMW,
+  SearchUserValidationMW,
 } from "../../validators/validators.js";
 import { VerifyTokenMW } from "../../auth/tokenAuth.js";
 
@@ -26,6 +27,6 @@ userRouter.patch(
   ChangePasswordValidationMW,
   changePassword
 );
-userRouter.patch("/search-user", searchUser);
+userRouter.post("/search-user", SearchUserValidationMW, searchUser);
 
 export { userRouter };

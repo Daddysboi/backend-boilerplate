@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
-import { MailingListModel } from "./model";
+
+import { MailingListModel } from "./model.js";
 
 dotenv.config();
 

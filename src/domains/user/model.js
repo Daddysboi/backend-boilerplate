@@ -21,7 +21,7 @@ const UserSchema = new Schema({
   role: {
     type: String,
     required: true,
-    enum: ["", ""],
+    enum: ["client", ""],
   },
   walletDetails: {
     type: Number,

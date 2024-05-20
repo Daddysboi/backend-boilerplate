@@ -1,9 +1,9 @@
 import express from "express";
-import { MailingListValidationMW } from "../../validators/validators";
+import { MailingListValidationMW } from "../../validators/validators.js";
 import { mailingList } from "./controllers.js";
 
-const router = express.Router();
+const mailingListRouter = express.Router();
 
-router.post("/mailing-list", MailingListValidationMW, mailingList);
+mailingListRouter.post("/mailing-list", MailingListValidationMW, mailingList);
 
-export { router };
+export { mailingListRouter };
